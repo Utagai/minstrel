@@ -72,13 +72,18 @@ export function authorizeSpotifyAPI(
     });
   });
 
-  app.listen(8888, () =>
+  const server = app.listen(8888, () =>
     console.log(
       'HTTP Server up. Now go to http://localhost:8888/login in your browser.',
     ),
   );
 
-  return p;
+  return p.then(() => {
+    // Remember to shut down express, now that we no longer need it for the
+    // OAuth flow.
+    console.log('Authenticated. HTTP server going down.');
+    server.close();
+  });
 }
 
 export default authorizeSpotifyAPI;
