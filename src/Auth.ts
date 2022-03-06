@@ -24,17 +24,6 @@ export function authorizeSpotifyAPI(
     );
   });
 
-  app.get('/info', (_, res) => {
-    spotifyAPI
-      .getMyRecentlyPlayedTracks({ limit: 3 })
-      .then((data) => {
-        res.json(data.body);
-      })
-      .catch((err) => {
-        res.send(`encountered an err: ${err}`);
-      });
-  });
-
   const p = new Promise<void>((resolve, reject) => {
     app.get('/callback', (req, res) => {
       const { code, error } = req.query;
