@@ -38,7 +38,7 @@ module.exports = {
       { devDependencies: ['**/*.test.ts', '**/*.test.tsx'] },
     ],
     'no-use-before-define': 'off',
-    '@typescript-eslint/no-use-before-define': ['error'],
+    '@typescript-eslint/no-use-before-define': ['error', { functions: false }],
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
   },
