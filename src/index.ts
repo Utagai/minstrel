@@ -1,7 +1,5 @@
-import SpotifyWebApi from 'spotify-web-api-node';
-
 import { applyEnvVars } from './Environment';
-import authorizeSpotifyClient from './Auth';
+import Spotify from './Spotify';
 
 applyEnvVars();
 
@@ -13,16 +11,15 @@ const scopes = [
 ];
 
 async function main() {
-  const spotifyAPI = new SpotifyWebApi({
-    redirectUri: 'http://localhost:8888/callback',
-    clientId: process.env.SPOTIFY_CLIENT_ID,
-    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  });
+  const spotify = new Spotify(
+    process.env.SPOTIFY_CLIENT_ID!,
+    process.env.SPOTIFY_CLIENT_SECRET!,
+    scopes,
+  );
 
-  await authorizeSpotifyClient(spotifyAPI, scopes);
+  await spotify.authorize();
 
-  spotifyAPI
-    .getMyRecentlyPlayedTracks({ limit: 3 })
+  spotify.API.getMyRecentlyPlayedTracks({ limit: 3 })
     .then((data) => {
       console.log(data);
     })
