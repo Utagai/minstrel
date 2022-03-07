@@ -1,3 +1,5 @@
+import util from 'util';
+
 import { applyEnvVars } from './Environment';
 import Spotify from './Spotify';
 
@@ -19,9 +21,10 @@ async function main() {
 
   await spotify.authorize();
 
-  spotify.API.getMyRecentlyPlayedTracks({ limit: 3 })
+  spotify
+    .getRecentlyPlayed()
     .then((data) => {
-      console.log(data);
+      console.log(util.inspect(data, false, null, true));
     })
     .catch((err) => {
       console.log(`encountered an err: ${err}`);

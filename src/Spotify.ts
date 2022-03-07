@@ -1,6 +1,11 @@
 import SpotifyWebApi from 'spotify-web-api-node';
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import { parse, parseJSON } from 'date-fns';
+
+import Event from './Event';
+import Track from './Track';
+import Artist from './Artist';
 
 const redirectURI = 'http://localhost:8888/callback';
 
@@ -78,6 +83,91 @@ class Spotify {
       console.log('Authenticated. HTTP server going down.');
       server.close();
     });
+  }
+
+  async #getArtists(artistIDs: string[]): Promise<Map<string, Artist>> {
+    return this.API.getArtists(artistIDs).then((artistsResp) => {
+      const artistMap = new Map<string, Artist>();
+      artistsResp.body.artists.forEach((artistResp) => {
+        artistMap.set(artistResp.id, {
+          spotifyID: artistResp.id,
+          name: artistResp.name,
+          followerCount: artistResp.followers.total,
+          genres: artistResp.genres,
+          imageURLs: artistResp.images.map((image) => image.url),
+          popularity: artistResp.popularity,
+        });
+      });
+      return artistMap;
+    });
+  }
+
+  async #getTracks(trackIDs: string[]): Promise<Map<string, Track>> {
+    return this.API.getTracks(trackIDs).then((tracksResp) => {
+      const trackMap = new Map<string, Track>();
+      tracksResp.body.tracks.forEach((trackResp) => {
+        trackMap.set(trackResp.id, {
+          spotifyID: trackResp.id,
+          durationMillis: trackResp.duration_ms,
+          isExplicit: trackResp.explicit,
+          name: trackResp.name,
+          isLocal: trackResp.is_local ?? null,
+          previewURL: trackResp.preview_url ?? null,
+          popularity: trackResp.popularity,
+          album: {
+            spotifyID: trackResp.album.id,
+            name: trackResp.album.name,
+            releaseDate: parse(
+              trackResp.album.release_date,
+              'yyyy-MM-dd',
+              new Date(),
+            ),
+            type: trackResp.album.album_type,
+            trackCount: trackResp.album.total_tracks,
+            imageURL: trackResp.album.images[0].url,
+          },
+        });
+      });
+      return trackMap;
+    });
+  }
+
+  async getRecentlyPlayed(): Promise<Event[]> {
+    // TODO: We need to do make this configurable via function argument.
+    return this.API.getMyRecentlyPlayedTracks({ limit: 3 })
+      .then((data) =>
+        data.body.items.map((item) => ({
+          playedAt: item.played_at,
+          trackID: item.track.id,
+          artistIDs: item.track.artists.map((artist) => artist.id),
+        })),
+      )
+      .then(async (recentPlays) => {
+        const tracksMap = this.#getTracks(
+          recentPlays.map((recentPlay) => recentPlay.trackID),
+        );
+        const artistsMap = this.#getArtists(
+          recentPlays.flatMap((recentPlay) => recentPlay.artistIDs),
+        );
+        const spotifyMetadataInfo = await Promise.all([tracksMap, artistsMap]);
+        return {
+          recentPlays,
+          tracksMap: spotifyMetadataInfo[0],
+          artistsMap: spotifyMetadataInfo[1],
+        };
+      })
+      .then(({ recentPlays, tracksMap, artistsMap }) =>
+        recentPlays.map((recentPlay) => {
+          const track = tracksMap.get(recentPlay.trackID)!;
+          return {
+            playedAt: parseJSON(recentPlay.playedAt),
+            track,
+            artists: recentPlay.artistIDs.map(
+              (artistID) => artistsMap.get(artistID)!,
+            ),
+          };
+        }),
+      );
   }
 }
 
