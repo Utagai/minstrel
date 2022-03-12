@@ -2,6 +2,7 @@ import SpotifyWebApi from 'spotify-web-api-node';
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { parse, parseJSON } from 'date-fns';
+import open from 'open';
 
 import Event from './Event';
 import Track from './Track';
@@ -71,11 +72,15 @@ class Spotify {
       });
     });
 
-    const server = app.listen(8888, () =>
+    const server = app.listen(8888, () => {
       console.log(
         'HTTP Server up. Now go to http://localhost:8888/login in your browser.',
-      ),
-    );
+      );
+      console.log(
+        'Going to try opening the above link in the browser automatically.',
+      );
+      open('http://localhost:8888/login');
+    });
 
     return p.then(() => {
       // Remember to shut down express, now that we no longer need it for the
