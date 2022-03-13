@@ -139,7 +139,7 @@ class Spotify {
 
   async getRecentlyPlayed(): Promise<Event[]> {
     // TODO: We need to do make this configurable via function argument.
-    return this.API.getMyRecentlyPlayedTracks({ limit: 3 })
+    return this.API.getMyRecentlyPlayedTracks({ limit: 10 })
       .then((data) =>
         data.body.items.map((item) => ({
           playedAt: item.played_at,
