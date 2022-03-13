@@ -1,3 +1,3 @@
-# `ts-eslint-prettier-jest-template`
+# `minstrel`
 
-A template repository that starts you off with Typescript, ESLint, Prettier and Jest.
+Stalks Spotify listen history and jots it down.
