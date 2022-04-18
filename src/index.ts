@@ -30,13 +30,10 @@ async function main() {
     .getRecentlyPlayed(latestEventTS)
     .then((data) => {
       console.log(util.inspect(data, false, null, true));
+      console.log(`================%%%%%=============`);
       inserter.insert(data).then((res) => {
         res.forEach((loadRes) => {
-          console.log(
-            `${loadRes.stmt}
-              ${loadRes.success ? '✅' : `❌${loadRes.error}`}
-            =======`,
-          );
+          console.log(`${loadRes.success ? '✅' : `❌${loadRes.error}`}`);
         });
       });
     })
