@@ -26,6 +26,17 @@ class Inserter {
     this.spotifyIDToSerial = new Map();
   }
 
+  async getLatestEventTimestamp(): Promise<Date> {
+    return this.pool
+      .query('SELECT ts FROM events ORDER BY ts DESC LIMIT 1')
+      .then((res) => {
+        if (res.rowCount !== 1) {
+          return new Date();
+        }
+        return res.rows[0]?.ts;
+      });
+  }
+
   /**
    * Loads the given events into the database as rows to the entity tables
    * (albums, artists and tracks).

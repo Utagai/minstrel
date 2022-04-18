@@ -21,10 +21,13 @@ async function main() {
   );
   const inserter = new Inserter();
 
+  const latestEventTS = await inserter.getLatestEventTimestamp();
+  console.log(`Latest event TS: ${latestEventTS}`);
+
   await spotify.authorize();
 
   spotify
-    .getRecentlyPlayed()
+    .getRecentlyPlayed(latestEventTS)
     .then((data) => {
       console.log(util.inspect(data, false, null, true));
       inserter.insert(data).then((res) => {

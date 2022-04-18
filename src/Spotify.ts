@@ -3,6 +3,7 @@ import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { parse, parseJSON } from 'date-fns';
 import open from 'open';
+import { getUnixTime } from 'date-fns';
 
 import Event from './Event';
 import Track from './Track';
@@ -91,6 +92,9 @@ class Spotify {
   }
 
   async #getArtists(artistIDs: string[]): Promise<Map<string, Artist>> {
+    // We need to catch the case where there is no artists because the API/SDK
+    // errors for some reason if we give it an empty array.
+    if (artistIDs.length === 0) return new Map();
     return this.API.getArtists(artistIDs).then((artistsResp) => {
       const artistMap = new Map<string, Artist>();
       artistsResp.body.artists.forEach((artistResp) => {
@@ -108,6 +112,9 @@ class Spotify {
   }
 
   async #getTracks(trackIDs: string[]): Promise<Map<string, Track>> {
+    // We need to catch the case where there is no artists because the API/SDK
+    // errors for some reason if we give it an empty array.
+    if (trackIDs.length === 0) return new Map();
     return this.API.getTracks(trackIDs).then((tracksResp) => {
       const trackMap = new Map<string, Track>();
       tracksResp.body.tracks.forEach((trackResp) => {
@@ -137,9 +144,13 @@ class Spotify {
     });
   }
 
-  async getRecentlyPlayed(): Promise<Event[]> {
+  async getRecentlyPlayed(after: Date, limit?: number): Promise<Event[]> {
+    const afterMS = (getUnixTime(after) + 1) * 1000;
     // TODO: We need to do make this configurable via function argument.
-    return this.API.getMyRecentlyPlayedTracks({ limit: 10 })
+    return this.API.getMyRecentlyPlayedTracks({
+      after: afterMS,
+      limit,
+    })
       .then((data) =>
         data.body.items.map((item) => ({
           playedAt: item.played_at,
