@@ -1,9 +1,8 @@
 import SpotifyWebApi from 'spotify-web-api-node';
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { parse, parseJSON } from 'date-fns';
+import { parse, parseJSON, getUnixTime } from 'date-fns';
 import open from 'open';
-import { getUnixTime } from 'date-fns';
 
 import Event from './Event';
 import Track from './Track';
