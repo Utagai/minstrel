@@ -20,8 +20,10 @@ async function main() {
     scopes,
   );
   await spotify.authorize();
+  console.log('Authorized Spotify');
   const inserter = new Inserter();
 
+  console.log('Beginning stalking loop');
   loop(spotify, inserter);
 }
 

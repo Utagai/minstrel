@@ -87,6 +87,7 @@ class Spotify {
       // OAuth flow.
       console.log('Authenticated. HTTP server going down.');
       server.close();
+      console.log('Closed HTTP server.');
     });
   }
 
