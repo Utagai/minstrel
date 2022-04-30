@@ -21,17 +21,23 @@ class Inserter {
 
   spotifyIDToSerial: Map<string, number>;
 
+  initializationTime: Date;
+
   constructor() {
     this.pool = new Pool();
     this.spotifyIDToSerial = new Map();
+    this.initializationTime = new Date();
   }
 
   async getLatestEventTimestamp(): Promise<Date> {
     return this.pool
       .query('SELECT ts FROM events ORDER BY ts DESC LIMIT 1')
       .then((res) => {
-        if (res.rowCount !== 1) {
-          return new Date();
+        if (res.rowCount < 1) {
+          // Database is empty.
+          // Therefore, give back the initialization time until it gets
+          // something back, after which this conditional will never execute.
+          return this.initializationTime;
         }
         return res.rows[0]?.ts;
       });
