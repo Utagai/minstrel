@@ -56,7 +56,9 @@ async function run(spotify: Spotify, inserter: Inserter) {
         .insert(data)
         .then((res) => {
           res.forEach((loadRes) => {
-            console.log(`${loadRes.success ? '✅' : `❌${loadRes.error}`}`);
+            if (!loadRes.success) {
+              console.log(`Error: ${loadRes.error}`);
+            }
           });
         })
         .catch((err) => {
