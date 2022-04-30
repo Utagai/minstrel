@@ -52,11 +52,16 @@ async function run(spotify: Spotify, inserter: Inserter) {
     .then((data) => {
       console.log(util.inspect(data, false, null, true));
       console.log(`================%%%%%=============`);
-      inserter.insert(data).then((res) => {
-        res.forEach((loadRes) => {
-          console.log(`${loadRes.success ? '✅' : `❌${loadRes.error}`}`);
+      inserter
+        .insert(data)
+        .then((res) => {
+          res.forEach((loadRes) => {
+            console.log(`${loadRes.success ? '✅' : `❌${loadRes.error}`}`);
+          });
+        })
+        .catch((err) => {
+          console.log(`failed to insert: ${err}`);
         });
-      });
     })
     .catch((err) => {
       console.log(`encountered an err: ${err}`);
