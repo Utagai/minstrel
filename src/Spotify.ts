@@ -22,14 +22,13 @@ type SpotifyCreds = {
 class Spotify {
   API: SpotifyWebApi;
 
-  // TODO: We now prefer using private instead of # in our projects.
-  #scopes: string[];
+  private scopes: string[];
 
   constructor(creds: SpotifyCreds) {
     this.API = new SpotifyWebApi();
     this.API.setCredentials(creds);
     this.API.setRedirectURI(redirectURI);
-    this.#scopes = creds.scopes;
+    this.scopes = creds.scopes;
   }
 
   async authorize(): Promise<void> {
@@ -53,7 +52,7 @@ class Spotify {
     const app = express();
 
     app.get('/login', (_, res) => {
-      res.redirect(this.API.createAuthorizeURL(this.#scopes, uuidv4()));
+      res.redirect(this.API.createAuthorizeURL(this.scopes, uuidv4()));
     });
 
     const p = new Promise<void>((resolve, reject) => {
@@ -121,7 +120,7 @@ class Spotify {
     }, (expireDuration / 2) * 1000);
   }
 
-  async #getArtists(artistIDs: string[]): Promise<Map<string, Artist>> {
+  private async getArtists(artistIDs: string[]): Promise<Map<string, Artist>> {
     // We need to catch the case where there is no artists because the API/SDK
     // errors for some reason if we give it an empty array.
     if (artistIDs.length === 0) return new Map();
@@ -141,7 +140,7 @@ class Spotify {
     });
   }
 
-  async #getTracks(trackIDs: string[]): Promise<Map<string, Track>> {
+  private async getTracks(trackIDs: string[]): Promise<Map<string, Track>> {
     // We need to catch the case where there is no artists because the API/SDK
     // errors for some reason if we give it an empty array.
     if (trackIDs.length === 0) return new Map();
@@ -189,10 +188,10 @@ class Spotify {
         })),
       )
       .then(async (recentPlays) => {
-        const tracksMap = this.#getTracks(
+        const tracksMap = this.getTracks(
           recentPlays.map((recentPlay) => recentPlay.trackID),
         );
-        const artistsMap = this.#getArtists(
+        const artistsMap = this.getArtists(
           recentPlays.flatMap((recentPlay) => recentPlay.artistIDs),
         );
         const spotifyMetadataInfo = await Promise.all([tracksMap, artistsMap]);
