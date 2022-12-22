@@ -17,6 +17,8 @@ async function main() {
   const spotify = new Spotify({
     clientId: process.env.SPOTIFY_CLIENT_ID!,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
+    accessToken: process.env.SPOTIFY_ACCESS_TOKEN,
+    refreshToken: process.env.SPOTIFY_REFRESH_TOKEN,
     scopes,
   });
   await spotify.authorize();

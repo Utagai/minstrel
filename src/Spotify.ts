@@ -32,9 +32,24 @@ class Spotify {
     this.#scopes = creds.scopes;
   }
 
-  // TODO: How will this automatic authorization work in production? We need to make
-  // sure we don't call open() for example...
   async authorize(): Promise<void> {
+    const creds = this.API.getCredentials();
+    const needsServerAuthFlow =
+      creds.accessToken !== undefined && creds.refreshToken !== undefined;
+
+    if (needsServerAuthFlow) {
+      console.log(
+        'Found access & refresh tokens, skipping server authentication flow',
+      );
+      const defaultExpireDuration = 3600;
+      this.startRefreshLoop(defaultExpireDuration);
+      return;
+    } else {
+      return this.startServerAuthFlow();
+    }
+  }
+
+  private async startServerAuthFlow(): Promise<void> {
     const app = express();
 
     app.get('/login', (_, res) => {
@@ -55,23 +70,18 @@ class Spotify {
           .then((data) => {
             const accessToken = data.body.access_token;
             const refreshToken = data.body.refresh_token;
-            const expiresIn = data.body.expires_in;
+            const expireDuration = data.body.expires_in;
 
             this.API.setAccessToken(accessToken);
             this.API.setRefreshToken(refreshToken);
 
             console.log(
-              `Sucessfully retreived access token. Expires in ${expiresIn} s.`,
+              `Sucessfully retreived access token. Expires in ${expireDuration} s.`,
             );
+
             res.json({ msg: 'Success. You can close this window.' });
 
-            setInterval(async () => {
-              const refreshData = await this.API.refreshAccessToken();
-              const refreshedAccessToken = refreshData.body.access_token;
-
-              console.log('The access token has been refreshed!');
-              this.API.setAccessToken(refreshedAccessToken);
-            }, (expiresIn / 2) * 1000);
+            this.startRefreshLoop(expireDuration);
             resolve();
           })
           .catch((err) => {
@@ -99,6 +109,16 @@ class Spotify {
       server.close();
       console.log('Closed HTTP server.');
     });
+  }
+
+  private startRefreshLoop(expireDuration: number) {
+    setInterval(async () => {
+      const refreshData = await this.API.refreshAccessToken();
+      const refreshedAccessToken = refreshData.body.access_token;
+
+      console.log('The access token has been refreshed!');
+      this.API.setAccessToken(refreshedAccessToken);
+    }, (expireDuration / 2) * 1000);
   }
 
   async #getArtists(artistIDs: string[]): Promise<Map<string, Artist>> {
