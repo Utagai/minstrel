@@ -10,20 +10,30 @@ import Artist from './Artist';
 
 const redirectURI = 'http://localhost:8888/callback';
 
+type SpotifyCreds = {
+  clientId: string;
+  clientSecret: string;
+  scopes: string[];
+
+  accessToken?: string;
+  refreshToken?: string;
+};
+
 class Spotify {
   API: SpotifyWebApi;
 
+  // TODO: We now prefer using private instead of # in our projects.
   #scopes: string[];
 
-  constructor(clientID: string, clientSecret: string, scopes: string[]) {
-    this.API = new SpotifyWebApi({
-      redirectUri: redirectURI,
-      clientId: clientID,
-      clientSecret,
-    });
-    this.#scopes = scopes;
+  constructor(creds: SpotifyCreds) {
+    this.API = new SpotifyWebApi();
+    this.API.setCredentials(creds);
+    this.API.setRedirectURI(redirectURI);
+    this.#scopes = creds.scopes;
   }
 
+  // TODO: How will this automatic authorization work in production? We need to make
+  // sure we don't call open() for example...
   async authorize(): Promise<void> {
     const app = express();
 

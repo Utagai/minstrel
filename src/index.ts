@@ -14,11 +14,11 @@ const scopes = [
 ];
 
 async function main() {
-  const spotify = new Spotify(
-    process.env.SPOTIFY_CLIENT_ID!,
-    process.env.SPOTIFY_CLIENT_SECRET!,
+  const spotify = new Spotify({
+    clientId: process.env.SPOTIFY_CLIENT_ID!,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
     scopes,
-  );
+  });
   await spotify.authorize();
   console.log('Authorized Spotify');
   const inserter = new Inserter();
