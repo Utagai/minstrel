@@ -50,6 +50,7 @@ class Spotify {
       this.logger.info(
         'found access and refresh tokens; skipping server auth flow',
       );
+      await this.refresh();
       const defaultExpireDuration = 3600;
       this.startRefreshLoop(defaultExpireDuration);
       return;
@@ -136,12 +137,16 @@ class Spotify {
 
   private startRefreshLoop(expireDuration: number) {
     setInterval(async () => {
-      const refreshData = await this.API.refreshAccessToken();
-      const refreshedAccessToken = refreshData.body.access_token;
-
-      this.logger.info('access token refreshed');
-      this.API.setAccessToken(refreshedAccessToken);
+      await this.refresh();
     }, (expireDuration / 2) * 1000);
+  }
+
+  private async refresh() {
+    const refreshData = await this.API.refreshAccessToken();
+    const refreshedAccessToken = refreshData.body.access_token;
+
+    this.logger.info('access token refreshed');
+    this.API.setAccessToken(refreshedAccessToken);
   }
 
   private async getArtists(artistIDs: string[]): Promise<Map<string, Artist>> {
