@@ -2,7 +2,7 @@ import SpotifyWebApi from 'spotify-web-api-node';
 import { Logger } from 'pino';
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { parse, parseJSON, getUnixTime } from 'date-fns';
+import { parseISO, parseJSON, getUnixTime } from 'date-fns';
 import open from 'open';
 
 import Event from './Event';
@@ -184,11 +184,7 @@ class Spotify {
           album: {
             spotifyID: trackResp.album.id,
             name: trackResp.album.name,
-            releaseDate: parse(
-              trackResp.album.release_date,
-              'yyyy-MM-dd',
-              new Date(),
-            ),
+            releaseDate: parseISO(trackResp.album.release_date),
             type: trackResp.album.album_type,
             trackCount: trackResp.album.total_tracks,
             imageURL: trackResp.album.images[0].url,
