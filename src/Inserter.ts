@@ -14,6 +14,11 @@ type Values = {
   otherColumns: any[];
 };
 
+type JoinPair = {
+  pair: [number, number];
+  event: Event;
+};
+
 /**
  * AKA, a lesson in why you should probably use an ORM.
  */
@@ -162,15 +167,16 @@ class Inserter {
 
   insertJoinTableEntries(
     stmt: string,
-    joinPairs: [number, number][],
+    joinPairs: JoinPair[],
   ): Promise<LoadResult[]> {
     return Promise.all(
       joinPairs.map((joinPair) =>
         this.pool
-          .query(stmt, joinPair)
-          .then((_) => ({ stmt, success: true }))
+          .query(stmt, joinPair.pair)
+          .then((_) => ({ stmt, event: joinPair.event, success: true }))
           .catch((queryErr) => ({
             stmt,
+            event: joinPair.event,
             success: false,
             error: queryErr,
           })),
@@ -188,10 +194,12 @@ class Inserter {
       const albumSerialID = this.spotifyIDToSerial.get(
         event.track.album.spotifyID,
       )!;
-      return event.artists.map((artist): [number, number] => [
-        albumSerialID,
-        this.spotifyIDToSerial.get(artist.spotifyID)!,
-      ]);
+      return event.artists.map(
+        (artist): JoinPair => ({
+          pair: [albumSerialID, this.spotifyIDToSerial.get(artist.spotifyID)!],
+          event,
+        }),
+      );
     });
 
     return this.insertJoinTableEntries(stmt, joinPairs);
@@ -203,12 +211,12 @@ class Inserter {
     VALUES     ($1,       $2      )
     ON CONFLICT ON CONSTRAINT album_track_pkey
     DO NOTHING`;
-    const joinPairs = events.map((event): [number, number] => {
+    const joinPairs = events.map((event): JoinPair => {
       const albumSerialID = this.spotifyIDToSerial.get(
         event.track.album.spotifyID,
       )!;
       const trackSerialID = this.spotifyIDToSerial.get(event.track.spotifyID)!;
-      return [albumSerialID, trackSerialID];
+      return { pair: [albumSerialID, trackSerialID], event };
     });
 
     return this.insertJoinTableEntries(stmt, joinPairs);
@@ -223,10 +231,12 @@ class Inserter {
     const joinPairs = events.flatMap((event) => {
       const trackSerialID = this.spotifyIDToSerial.get(event.track.spotifyID)!;
 
-      return event.artists.map((artist): [number, number] => [
-        trackSerialID,
-        this.spotifyIDToSerial.get(artist.spotifyID)!,
-      ]);
+      return event.artists.map(
+        (artist): JoinPair => ({
+          pair: [trackSerialID, this.spotifyIDToSerial.get(artist.spotifyID)!],
+          event,
+        }),
+      );
     });
 
     return this.insertJoinTableEntries(stmt, joinPairs);
@@ -249,8 +259,13 @@ class Inserter {
         )!;
         return this.pool
           .query(stmt, [ts, trackSerialID, albumSerialID])
-          .then((_) => ({ stmt, success: true }))
-          .catch((queryErr) => ({ stmt, success: false, error: queryErr }));
+          .then((_) => ({ stmt, event, success: true }))
+          .catch((queryErr) => ({
+            stmt,
+            event,
+            success: false,
+            error: queryErr,
+          }));
       }),
     );
   }

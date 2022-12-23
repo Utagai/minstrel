@@ -76,7 +76,11 @@ async function run(
           res.forEach((loadRes) => {
             if (!loadRes.success) {
               logger.error(
-                { err: loadRes.error, stmt: loadRes.stmt },
+                {
+                  err: loadRes.error,
+                  stmt: loadRes.stmt,
+                  event: loadRes.event,
+                },
                 'failed to insert individual listen event',
               );
             }
