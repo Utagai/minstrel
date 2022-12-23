@@ -137,7 +137,7 @@ async function wrapWithRetry<T>(
 //                Wait 10m for 2nd collection        |
 //                                                  25m
 //                                            2nd collection starts
-//                                            ! But this is >10m since the 1st!
+//                                            But this is >10m since the 1st!
 //
 //
 // It is technically possible to fix this to _some_ degree. One can
