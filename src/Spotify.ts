@@ -1,4 +1,5 @@
 import SpotifyWebApi from 'spotify-web-api-node';
+import { Logger } from 'pino';
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { parse, parseJSON, getUnixTime } from 'date-fns';
@@ -22,9 +23,12 @@ type SpotifyCreds = {
 class Spotify {
   API: SpotifyWebApi;
 
+  private logger: Logger;
+
   private scopes: string[];
 
-  constructor(creds: SpotifyCreds) {
+  constructor(creds: SpotifyCreds, logger: Logger) {
+    this.logger = logger;
     this.API = new SpotifyWebApi();
     this.API.setCredentials(creds);
     this.API.setRedirectURI(redirectURI);
@@ -32,13 +36,15 @@ class Spotify {
   }
 
   async authorize(): Promise<void> {
+    this.logger.info('starting spotify authorization');
+
     const creds = this.API.getCredentials();
     const needsServerAuthFlow =
       creds.accessToken !== undefined && creds.refreshToken !== undefined;
 
     if (needsServerAuthFlow) {
-      console.log(
-        'Found access & refresh tokens, skipping server authentication flow',
+      this.logger.info(
+        'found access and refresh tokens; skipping server auth flow',
       );
       const defaultExpireDuration = 3600;
       this.startRefreshLoop(defaultExpireDuration);
@@ -57,46 +63,51 @@ class Spotify {
 
     const p = new Promise<void>((resolve, reject) => {
       app.get('/callback', (req, res) => {
-        const { code, error } = req.query;
+        const { code, err } = req.query;
 
-        if (error) {
-          console.error('Callback Error:', error);
-          res.json({ error });
-          return;
+        if (err) {
+          this.logger.error({
+            msg: 'failed to authenticate with spotify',
+            err,
+          });
+          res.json({ err });
+          return reject(err);
         }
 
         this.API.authorizationCodeGrant(code!.toString())
           .then((data) => {
             const accessToken = data.body.access_token;
             const refreshToken = data.body.refresh_token;
-            const expireDuration = data.body.expires_in;
+            const expireDurationSecs = data.body.expires_in;
 
             this.API.setAccessToken(accessToken);
             this.API.setRefreshToken(refreshToken);
 
-            console.log(
-              `Sucessfully retreived access token. Expires in ${expireDuration} s.`,
-            );
+            this.logger.info({
+              msg: 'sucessfully retreived access token',
+              expireDurationSecs,
+            });
 
             res.json({ msg: 'Success. You can close this window.' });
 
-            this.startRefreshLoop(expireDuration);
-            resolve();
+            this.startRefreshLoop(expireDurationSecs);
+            return resolve();
           })
           .catch((err) => {
             const errMsg = `Error getting Tokens: ${err}`;
             res.json({ err: errMsg });
-            reject(err);
+            return reject(err);
           });
       });
     });
 
     const server = app.listen(8888, () => {
-      console.log(
-        'HTTP Server up. Now go to http://localhost:8888/login in your browser.',
-      );
-      console.log(
-        'Going to try opening the above link in the browser automatically.',
+      this.logger.info({
+        msg: 'server up, awaiting browser visit',
+        url: 'http://localhost:8888/login',
+      });
+      this.logger.info(
+        'going to try opening login link in the browser automatically',
       );
       open('http://localhost:8888/login');
     });
@@ -104,9 +115,18 @@ class Spotify {
     return p.then(() => {
       // Remember to shut down express, now that we no longer need it for the
       // OAuth flow.
-      console.log('Authenticated. HTTP server going down.');
-      server.close();
-      console.log('Closed HTTP server.');
+      return new Promise((resolve, reject) => {
+        this.logger.info('authenticated; shutting down server');
+        server.close((err) => {
+          if (err === undefined) {
+            this.logger.info('server shut down');
+            resolve();
+          } else {
+            this.logger.error({ msg: 'failed to shut down server', err });
+            reject(err);
+          }
+        });
+      });
     });
   }
 
@@ -115,7 +135,7 @@ class Spotify {
       const refreshData = await this.API.refreshAccessToken();
       const refreshedAccessToken = refreshData.body.access_token;
 
-      console.log('The access token has been refreshed!');
+      this.logger.info('access token refreshed');
       this.API.setAccessToken(refreshedAccessToken);
     }, (expireDuration / 2) * 1000);
   }

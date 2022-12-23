@@ -1,5 +1,7 @@
 import util from 'util';
 
+import Pino from 'pino';
+
 import { applyEnvVars } from './Environment';
 import Spotify from './Spotify';
 import Inserter from './Inserter';
@@ -13,19 +15,24 @@ const scopes = [
   'user-read-recently-played',
 ];
 
+const logger = Pino();
+
 async function main() {
-  const spotify = new Spotify({
-    clientId: process.env.SPOTIFY_CLIENT_ID!,
-    clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
-    accessToken: process.env.SPOTIFY_ACCESS_TOKEN,
-    refreshToken: process.env.SPOTIFY_REFRESH_TOKEN,
-    scopes,
-  });
+  const spotify = new Spotify(
+    {
+      clientId: process.env.SPOTIFY_CLIENT_ID!,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
+      accessToken: process.env.SPOTIFY_ACCESS_TOKEN,
+      refreshToken: process.env.SPOTIFY_REFRESH_TOKEN,
+      scopes,
+    },
+    logger,
+  );
   await spotify.authorize();
-  console.log('Authorized Spotify');
+  logger.info('authorized');
   const inserter = new Inserter();
 
-  console.log('Beginning stalking loop');
+  logger.info('beginning stalk loop');
   loop(spotify, inserter);
 }
 
@@ -47,28 +54,34 @@ async function loop(spotify: Spotify, inserter: Inserter) {
 
 async function run(spotify: Spotify, inserter: Inserter) {
   const latestEventTS = await inserter.getLatestEventTimestamp();
-  console.log(`Latest event TS: ${latestEventTS}`);
+  logger.info({ msg: 'fetching listen data', latestEventTS });
 
   spotify
     .getRecentlyPlayed(latestEventTS)
     .then((data) => {
-      console.log(util.inspect(data, false, null, true));
-      console.log(`================%%%%%=============`);
+      logger.info({
+        msg: 'got recently played data',
+        numTracks: data.length,
+        data,
+      });
       inserter
         .insert(data)
         .then((res) => {
           res.forEach((loadRes) => {
             if (!loadRes.success) {
-              console.log(`Error: ${loadRes.error}`);
+              logger.error({
+                msg: 'failed to insert individual listen event',
+                err: loadRes.error,
+              });
             }
           });
         })
         .catch((err) => {
-          console.log(`failed to insert: ${err}`);
+          logger.error({ msg: 'failed to insert listen data', err });
         });
     })
     .catch((err) => {
-      console.log(`encountered an err: ${err}`);
+      logger.error({ msg: 'failed to get recently played tracks', err });
     });
 }
 
