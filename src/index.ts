@@ -153,7 +153,27 @@ async function wrapWithRetry<T>(
 // It is technically possible to fix this to _some_ degree. One can
 // make the wait time between collection events variable depending on
 // how long it took to finish the prior collection, but this still
-// caps our maximum retry window to the periodicity.
+// caps our maximum retry window to the periodicity. Additionally, the
+// Spotify API takes after & before parameters to their call, and it
+// may be possible to incrementally tighten the interval we query
+// until we find a result with a size <50. Once we find this, we can
+// insert those elements, and then consider this tightened interval
+// processed, and repeat this process for the remainder of the
+// original interval. For example:
+//
+//   1. Try to get events from ts=0 to te=10 (ts = t-start, te=t-end).
+//   2. The number of events here was >=50, therefore, we may have
+//      missed some events.
+//   3. Tighten the interval to ts=0 to te=5.
+//   4. The number of events here is still >=50, therefore we may have
+//      missed some events.
+//   6. Further tighten the interval to ts=0 to te=2.5.
+//   7. The number of events here is <50! We have all the
+//      events. Process & insert them.
+//   8. Now the remaining interval to process is ts=2.5 to
+//      te=10. Repeat from step 1 with ts=2.5 & te=10.
+//
+// As you can imagine, this is significantly more complex to implement.
 //
 // I've elected to not expend effort in implementing this, because I
 // expect retries to not take up that much time, and additionally,
