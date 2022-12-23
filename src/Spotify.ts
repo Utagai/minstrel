@@ -71,10 +71,7 @@ class Spotify {
         const { code, err } = req.query;
 
         if (err) {
-          this.logger.error({
-            msg: 'failed to authenticate with spotify',
-            err,
-          });
+          this.logger.error({ err }, 'failed to authenticate with spotify');
           res.json({ err });
           return reject(err);
         }
@@ -127,7 +124,7 @@ class Spotify {
             this.logger.info('server shut down');
             resolve();
           } else {
-            this.logger.error({ msg: 'failed to shut down server', err });
+            this.logger.error({ err }, 'failed to shut down server');
             reject(err);
           }
         });

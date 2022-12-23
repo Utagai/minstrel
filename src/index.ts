@@ -75,16 +75,16 @@ async function run(
         .then((res) => {
           res.forEach((loadRes) => {
             if (!loadRes.success) {
-              logger.error({
-                msg: 'failed to insert individual listen event',
-                err: loadRes.error,
-              });
+              logger.error(
+                { err: loadRes.error },
+                'failed to insert individual listen event',
+              );
             }
           });
           logger.info('inserted all listen data');
         })
         .catch((err) => {
-          logger.error({ msg: 'failed to insert listen data', err });
+          logger.error({ err }, 'failed to insert listen data');
         });
     });
 
