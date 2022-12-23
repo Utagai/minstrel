@@ -128,7 +128,7 @@ async function wrapWithRetry<T>(
 //        ┌───────────────── >10m! ──────────────────┐
 //        │                                          │
 //  0m
-// <|─────|───────────────|──────────────────────────|──────────────────────────>
+// <|─────|───────────────|──────────────────────────|────────────>
 //        |               |                          |
 //        10m             |                          |
 //   1st collection       |                          |
@@ -136,8 +136,8 @@ async function wrapWithRetry<T>(
 //                Retries finally end                |
 //                Wait 10m for 2nd collection        |
 //                                                  25m
-//                                            2nd collection starts
-//                                            But this is >10m since the 1st!
+//                                2nd collection starts
+//                                But this is >10m since the 1st!
 //
 //
 // It is technically possible to fix this to _some_ degree. One can
