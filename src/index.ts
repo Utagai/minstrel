@@ -102,9 +102,57 @@ async function wrapWithRetry<T>(
   });
 }
 
-// TODO: Update post-debugging.
-const maxRetries = 3;
-const retryDelayMS = 5 * 1000; // 30 seconds.
+// NOTE: Setting these values is a bit tricky...
+// This program is fundamentally a bit brittle. This is because
+// Spotify limits our ability to get past listening data for >50
+// tracks. We set the periodicity of collection to be 10 minutes, and
+// assume that this is the safe periodicity to make sure we don't miss
+// any songs. The rough reasoning for this choice being that there is
+// no way a user could possibly listen to 50 songs start to finish
+// before 10 minutes is up. This is a pretty reasonable assumption and
+// it _should work_...
+//
+// Of course, it isn't that simple, namely due to retry behavior. To
+// see this, imagine that we trigger a collection of listen data on
+// the 10th minute. Then, we keep retrying for e.g. 5 minutes before
+// finally passing. If we do this, by the time we finish our work,
+// we'll then proceed to wait 10 more minutes. However, from the last
+// collection event, we waited a total of _15_ minutes! This is
+// technically, according to our assumption from before, enough time
+// for a user to listen to >50 songs.
+//
+// Visually, you can see the error case via this timeline:
+//
+//
+//
+//        ┌----------------- >10m! ------------------┐
+//        |                                          |
+//  0m
+// <|-----|---------------|--------------------------|--------------------------->
+//        |               |                          |
+//        10m             |                          |
+//   1st collection       |                          |
+//                       ~15m                        |
+//                Retries finally end                |
+//                Wait 10m for 2nd collection        |
+//                                                  25m
+//                                            2nd collection starts
+//                                            ! But this is >10m since the 1st!
+//
+//
+// It is technically possible to fix this to _some_ degree. One can
+// make the wait time between collection events variable depending on
+// how long it took to finish the prior collection, but this still
+// caps our maximum retry window to the periodicity.
+//
+// I've elected to not expend effort in implementing this, because I
+// expect retries to not take up that much time, and additionally,
+// since this service's function is to aggregate large amounts of
+// data, a few missing songs, even the missing of an entire batch's
+// worth (50) is not going to have a big impact at all.
+
+const maxRetries = 10;
+const retryDelayMS = 30 * 1000; // 30 seconds.
 
 async function retry<T>(
   op: string,

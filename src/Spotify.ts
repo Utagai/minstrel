@@ -207,7 +207,6 @@ class Spotify {
     // the 50th second, then sending an API request for that 50th
     // listen would include that listen event, leading to duplication.
     const afterMS = (getUnixTime(after) + 1) * 1000;
-    // TODO: We need to do make this configurable via function argument.
     return this.API.getMyRecentlyPlayedTracks({
       after: afterMS,
       limit,
