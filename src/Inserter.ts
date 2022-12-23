@@ -4,6 +4,7 @@ import Event from './Event';
 
 type LoadResult = {
   stmt: string;
+  event: Event;
   success: boolean;
   error?: Error;
 };
@@ -26,6 +27,7 @@ class Inserter {
   constructor() {
     this.pool = new Pool();
     this.spotifyIDToSerial = new Map();
+    // TODO: There may be a timezone bug here.
     this.initializationTime = new Date();
   }
 
@@ -70,10 +72,16 @@ class Inserter {
             this.spotifyIDToSerial.set(extract.spotifyID, queryRes.rows[0]?.id);
             return {
               stmt,
+              event,
               success: true,
             };
           })
-          .catch((queryErr) => ({ stmt, success: false, error: queryErr })),
+          .catch((queryErr) => ({
+            stmt,
+            event,
+            success: false,
+            error: queryErr,
+          })),
       );
     });
     return Promise.all(queries);
