@@ -21,7 +21,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: album_artist; Type: TABLE; Schema: public; Owner: may
+-- Name: album_artist; Type: TABLE; Schema: public; Owner: minstrel
 --
 
 CREATE TABLE public.album_artist (
@@ -30,10 +30,10 @@ CREATE TABLE public.album_artist (
 );
 
 
-ALTER TABLE public.album_artist OWNER TO may;
+ALTER TABLE public.album_artist OWNER TO minstrel;
 
 --
--- Name: album_track; Type: TABLE; Schema: public; Owner: may
+-- Name: album_track; Type: TABLE; Schema: public; Owner: minstrel
 --
 
 CREATE TABLE public.album_track (
@@ -42,10 +42,10 @@ CREATE TABLE public.album_track (
 );
 
 
-ALTER TABLE public.album_track OWNER TO may;
+ALTER TABLE public.album_track OWNER TO minstrel;
 
 --
--- Name: albums; Type: TABLE; Schema: public; Owner: may
+-- Name: albums; Type: TABLE; Schema: public; Owner: minstrel
 --
 
 CREATE TABLE public.albums (
@@ -59,10 +59,10 @@ CREATE TABLE public.albums (
 );
 
 
-ALTER TABLE public.albums OWNER TO may;
+ALTER TABLE public.albums OWNER TO minstrel;
 
 --
--- Name: albums_album_id_seq; Type: SEQUENCE; Schema: public; Owner: may
+-- Name: albums_album_id_seq; Type: SEQUENCE; Schema: public; Owner: minstrel
 --
 
 CREATE SEQUENCE public.albums_album_id_seq
@@ -73,17 +73,17 @@ CREATE SEQUENCE public.albums_album_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.albums_album_id_seq OWNER TO may;
+ALTER TABLE public.albums_album_id_seq OWNER TO minstrel;
 
 --
--- Name: albums_album_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: may
+-- Name: albums_album_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: minstrel
 --
 
 ALTER SEQUENCE public.albums_album_id_seq OWNED BY public.albums.id;
 
 
 --
--- Name: artists; Type: TABLE; Schema: public; Owner: may
+-- Name: artists; Type: TABLE; Schema: public; Owner: minstrel
 --
 
 CREATE TABLE public.artists (
@@ -97,10 +97,10 @@ CREATE TABLE public.artists (
 );
 
 
-ALTER TABLE public.artists OWNER TO may;
+ALTER TABLE public.artists OWNER TO minstrel;
 
 --
--- Name: artists_artist_id_seq; Type: SEQUENCE; Schema: public; Owner: may
+-- Name: artists_artist_id_seq; Type: SEQUENCE; Schema: public; Owner: minstrel
 --
 
 CREATE SEQUENCE public.artists_artist_id_seq
@@ -111,17 +111,17 @@ CREATE SEQUENCE public.artists_artist_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.artists_artist_id_seq OWNER TO may;
+ALTER TABLE public.artists_artist_id_seq OWNER TO minstrel;
 
 --
--- Name: artists_artist_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: may
+-- Name: artists_artist_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: minstrel
 --
 
 ALTER SEQUENCE public.artists_artist_id_seq OWNED BY public.artists.id;
 
 
 --
--- Name: events; Type: TABLE; Schema: public; Owner: may
+-- Name: events; Type: TABLE; Schema: public; Owner: minstrel
 --
 
 CREATE TABLE public.events (
@@ -131,10 +131,10 @@ CREATE TABLE public.events (
 );
 
 
-ALTER TABLE public.events OWNER TO may;
+ALTER TABLE public.events OWNER TO minstrel;
 
 --
--- Name: track_artist; Type: TABLE; Schema: public; Owner: may
+-- Name: track_artist; Type: TABLE; Schema: public; Owner: minstrel
 --
 
 CREATE TABLE public.track_artist (
@@ -143,10 +143,10 @@ CREATE TABLE public.track_artist (
 );
 
 
-ALTER TABLE public.track_artist OWNER TO may;
+ALTER TABLE public.track_artist OWNER TO minstrel;
 
 --
--- Name: tracks; Type: TABLE; Schema: public; Owner: may
+-- Name: tracks; Type: TABLE; Schema: public; Owner: minstrel
 --
 
 CREATE TABLE public.tracks (
@@ -161,10 +161,10 @@ CREATE TABLE public.tracks (
 );
 
 
-ALTER TABLE public.tracks OWNER TO may;
+ALTER TABLE public.tracks OWNER TO minstrel;
 
 --
--- Name: tracks_track_id_seq; Type: SEQUENCE; Schema: public; Owner: may
+-- Name: tracks_track_id_seq; Type: SEQUENCE; Schema: public; Owner: minstrel
 --
 
 CREATE SEQUENCE public.tracks_track_id_seq
@@ -175,38 +175,38 @@ CREATE SEQUENCE public.tracks_track_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tracks_track_id_seq OWNER TO may;
+ALTER TABLE public.tracks_track_id_seq OWNER TO minstrel;
 
 --
--- Name: tracks_track_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: may
+-- Name: tracks_track_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: minstrel
 --
 
 ALTER SEQUENCE public.tracks_track_id_seq OWNED BY public.tracks.id;
 
 
 --
--- Name: albums id; Type: DEFAULT; Schema: public; Owner: may
+-- Name: albums id; Type: DEFAULT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.albums ALTER COLUMN id SET DEFAULT nextval('public.albums_album_id_seq'::regclass);
 
 
 --
--- Name: artists id; Type: DEFAULT; Schema: public; Owner: may
+-- Name: artists id; Type: DEFAULT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.artists ALTER COLUMN id SET DEFAULT nextval('public.artists_artist_id_seq'::regclass);
 
 
 --
--- Name: tracks id; Type: DEFAULT; Schema: public; Owner: may
+-- Name: tracks id; Type: DEFAULT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.tracks ALTER COLUMN id SET DEFAULT nextval('public.tracks_track_id_seq'::regclass);
 
 
 --
--- Name: album_artist album_artist_pkey; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: album_artist album_artist_pkey; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.album_artist
@@ -214,7 +214,7 @@ ALTER TABLE ONLY public.album_artist
 
 
 --
--- Name: album_track album_track_pkey; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: album_track album_track_pkey; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.album_track
@@ -222,7 +222,7 @@ ALTER TABLE ONLY public.album_track
 
 
 --
--- Name: albums albums_pkey; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: albums albums_pkey; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.albums
@@ -230,7 +230,7 @@ ALTER TABLE ONLY public.albums
 
 
 --
--- Name: albums albums_spotify_id_key; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: albums albums_spotify_id_key; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.albums
@@ -238,7 +238,7 @@ ALTER TABLE ONLY public.albums
 
 
 --
--- Name: artists artists_pkey; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: artists artists_pkey; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.artists
@@ -246,7 +246,7 @@ ALTER TABLE ONLY public.artists
 
 
 --
--- Name: artists artists_spotify_id_key; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: artists artists_spotify_id_key; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.artists
@@ -254,7 +254,7 @@ ALTER TABLE ONLY public.artists
 
 
 --
--- Name: events events_pkey; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: events events_pkey; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.events
@@ -262,7 +262,7 @@ ALTER TABLE ONLY public.events
 
 
 --
--- Name: track_artist track_artist_pkey; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: track_artist track_artist_pkey; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.track_artist
@@ -270,7 +270,7 @@ ALTER TABLE ONLY public.track_artist
 
 
 --
--- Name: tracks tracks_pkey; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: tracks tracks_pkey; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.tracks
@@ -278,7 +278,7 @@ ALTER TABLE ONLY public.tracks
 
 
 --
--- Name: tracks tracks_spotify_id_key; Type: CONSTRAINT; Schema: public; Owner: may
+-- Name: tracks tracks_spotify_id_key; Type: CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.tracks
@@ -286,7 +286,7 @@ ALTER TABLE ONLY public.tracks
 
 
 --
--- Name: album_artist albumfk; Type: FK CONSTRAINT; Schema: public; Owner: may
+-- Name: album_artist albumfk; Type: FK CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.album_artist
@@ -294,7 +294,7 @@ ALTER TABLE ONLY public.album_artist
 
 
 --
--- Name: album_track albumfk; Type: FK CONSTRAINT; Schema: public; Owner: may
+-- Name: album_track albumfk; Type: FK CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.album_track
@@ -302,7 +302,7 @@ ALTER TABLE ONLY public.album_track
 
 
 --
--- Name: album_artist artistfk; Type: FK CONSTRAINT; Schema: public; Owner: may
+-- Name: album_artist artistfk; Type: FK CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.album_artist
@@ -310,7 +310,7 @@ ALTER TABLE ONLY public.album_artist
 
 
 --
--- Name: track_artist artistfk; Type: FK CONSTRAINT; Schema: public; Owner: may
+-- Name: track_artist artistfk; Type: FK CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.track_artist
@@ -318,7 +318,7 @@ ALTER TABLE ONLY public.track_artist
 
 
 --
--- Name: events events_album_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: may
+-- Name: events events_album_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.events
@@ -326,7 +326,7 @@ ALTER TABLE ONLY public.events
 
 
 --
--- Name: events events_track_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: may
+-- Name: events events_track_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.events
@@ -334,7 +334,7 @@ ALTER TABLE ONLY public.events
 
 
 --
--- Name: album_track trackfk; Type: FK CONSTRAINT; Schema: public; Owner: may
+-- Name: album_track trackfk; Type: FK CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.album_track
@@ -342,7 +342,7 @@ ALTER TABLE ONLY public.album_track
 
 
 --
--- Name: track_artist trackfk; Type: FK CONSTRAINT; Schema: public; Owner: may
+-- Name: track_artist trackfk; Type: FK CONSTRAINT; Schema: public; Owner: minstrel
 --
 
 ALTER TABLE ONLY public.track_artist
