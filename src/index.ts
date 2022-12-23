@@ -75,6 +75,7 @@ async function run(spotify: Spotify, inserter: Inserter) {
               });
             }
           });
+          logger.info('inserted all listen data');
         })
         .catch((err) => {
           logger.error({ msg: 'failed to insert listen data', err });
