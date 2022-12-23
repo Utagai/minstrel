@@ -20,6 +20,10 @@ type SpotifyCreds = {
   refreshToken?: string;
 };
 
+// TODO: This could be made into an interface. Then, we can have the following impls:
+// * A mocked impl for testing purposes.
+// * A wrapper impl that retries failed operations on its wrappee.
+// * This thing.
 class Spotify {
   API: SpotifyWebApi;
 
@@ -194,6 +198,9 @@ class Spotify {
   }
 
   async getRecentlyPlayed(after: Date, limit?: number): Promise<Event[]> {
+    // +1 here, since, if the latest known listen event was at, say,
+    // the 50th second, then sending an API request for that 50th
+    // listen would include that listen event, leading to duplication.
     const afterMS = (getUnixTime(after) + 1) * 1000;
     // TODO: We need to do make this configurable via function argument.
     return this.API.getMyRecentlyPlayedTracks({
